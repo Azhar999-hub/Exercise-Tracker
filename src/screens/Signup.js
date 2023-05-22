@@ -1,50 +1,72 @@
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import { Box } from "@mui/material";
 
 import React, { useState } from "react";
 
-import { useFormik } from "formik";
+import { Link, useNavigate } from "react-router-dom";
 
-import * as Yup from "yup";
-
-import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Signup = () => {
-  // let [email, setEmail] = useState("");
+  let navigation = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  let { handleSubmit, handleChange, handleBlur, values, errors, touched } =
-    useFormik({
-      initialValues: {
-        name: "",
-        email: "",
-        password: "",
-      },
-      validationSchema: Yup.object({
-        name: Yup.string()
-          .min(4, "Please provide atleast  four characters")
-          .max(20, "too long names are not allowed")
-          .required("Name can not be empty"),
-        email: Yup.string()
-          .email("Please enter a valid email")
-          .required("Required"),
-        password: Yup.string()
-          .min(8, "min 8 characters")
-          .max(15, "max 15 characters")
-          .required("Please provide a valid password"),
-      }),
-      onSubmit: (value) => {
-        console.log(value);
-      },
-    });
+  let goToLogin = () => {
+    navigation("/Login");
+    console.log("Run");
+  };
 
-  // handleSubmit = (e) => {
-  //   const email = e.target.email.value;
-  //   const name = e.target.name.value;
-  //   const password = e.target.password.value;
-
-  //   console.log("User Name: " + name);
-  //   console.log("User Email: " + email);
-  //   console.log("User Password: " + password);
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   console.log(name, value);
+  //   setUser({ ...user, [name]: value });
   // };
+
+  //   const signUp = () => {
+  //     const { name, email, password } = user
+  //     if( name && email && password){
+  //         axios.post("http://localhost:5000/signup", user)
+  //         .then( res => {
+  //           // alert("Sign Up Successfull")
+  //             alert(res.data.message)
+  //             navigation("/login")
+  //         })
+  //     } else {
+  //         alert("invalid input")
+  //     }
+  // }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    console.log(name, email, password);
+    fetch("http://localhost:5000/signup", {
+      method: "POST",
+      crossDomain: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "userRegister");
+        if (data.status === "ok") {
+          alert("Registration Successful");
+          window.location.href = "./Login";
+        } else {
+          alert("Something went wrong");
+        }
+      });
+  };
 
   return (
     <div className="container">
@@ -61,70 +83,63 @@ const Signup = () => {
           <h2 className="animate__animated animate__heartBeat animate__infinite text-primary">
             SignUp <FingerprintIcon fontSize="large" />
           </h2>
+          {/* {console.log("user",user)} */}
           <form onSubmit={handleSubmit}>
-            <div className="form-row py-1 pt-5">
+            <div className="form-row py-2 pt-5">
               <div className="col-lg-10 offset-1">
                 <input
+                  name="name"
                   type="text"
                   className="inp px-3"
                   placeholder="User Name"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.name}
                   id="name"
-                  name="name"
+                  onChange={(e) => setName(e.target.value)}
                 />
-                <p style={{ color: "red" }}>
-                  {touched.name && errors.name ? errors.name : null}
-                </p>
               </div>
             </div>
-            <div className="form-row py-1 ">
+            <div className="form-row py-2 ">
               <div className="col-lg-10 offset-1">
                 <input
                   type="email"
                   className="inp  px-3"
                   placeholder="User Email"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.email}
                   id="email"
                   name="email"
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <p style={{ color: "red" }}>
-                  {touched.email && errors.email ? errors.email : null}
-                </p>
               </div>
             </div>
-            <div className="form-row py-1 ">
+            <div className="form-row py-2 ">
               <div className="col-lg-10 offset-1">
                 <input
                   type="password"
                   className="inp px-3"
                   placeholder="User Password"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.password}
                   id="password"
                   name="password"
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-                <p style={{ color: "red" }}>
-                  {touched.password && errors.password ? errors.password : null}
-                </p>
               </div>
             </div>
-            <div className="form-row py-1 ">
+            <div className="form-row py-2 ">
               <div className="col-lg-10 offset-1">
-                <button className="btn-one  px-3">SignUp</button>
+                <button type="submit" className="btn-one  px-3">
+                  SignUp
+                </button>
               </div>
             </div>
           </form>
-          <p>
-            i'm already a member! &nbsp;
-            <Link className="text-primary" style={{ textDecoration: "none" }}>
-              Sign in
-            </Link>
-          </p>
+          <Box className="mt-2 d-flex justify-content-center align-items-center">
+            <p>
+              Already have an account!{" "}
+              <a
+                href=" "
+                style={{ textDecoration: "none" }}
+                onClick={goToLogin}>
+                Login
+              </a>
+            </p>
+          </Box>
         </div>
       </div>
     </div>
